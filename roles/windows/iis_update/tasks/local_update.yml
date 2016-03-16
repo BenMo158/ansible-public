@@ -1,26 +1,11 @@
 ---
-- block:
-  - name: Local | 项目 "{{ site_path }}" 检出
-    local_action: |
-      shell \
-        {% if revision_old.stdout == "" %}
-           svn co {{ svn_info.url }}/{{ site_path }} {{ svn_temp }}/{{ site_path }} --username {{ svn_info.user }} --password {{ svn_info.pass }} --force --no-auth-cache --non-interactive --trust-server-cert
-        {% else %}
-           svn up -r {{ revision }} {{ svn_temp }}/{{ site_path }} --username {{ svn_info.user }} --password {{ svn_info.pass }} --force --no-auth-cache --non-interactive --trust-server-cert
-        {% endif %} 
-      > {{ rsync.log_path }}
-  
-#  - name: Local | Copy to rsync temp
-#    local_action: |
-#      shell \
-#        if [ ! -d {{ rsync_temp }}/{{ site_path }} ];then
-#           mkdir -p {{ rsync_temp }}/{{ site_path }}
-#        fi
-#        /usr/bin/rsync -aupot --delete --exclude "*.log" --exclude ".svn"  {{ svn_temp }}/{{ site_path }}/ {{ rsync_temp }}/{{ site_path }}
-#  
-#  - name: Local | Change Config
-#    local_action: template src={{ svn_temp }}/{{ site_path }}/{{ item }} dest={{ rsync_temp }}/{{ site_path }}/{{ item }}
-#    with_items: config_files
-#    ignore_errors: true
-
+- name: Local | 项目 "{{ site_path }}" 检出
+  local_action: |
+    shell \
+      {% if revision_old.stdout == "" %}
+         svn co {{ svn_info.url }}/{{ site_path }} {{ svn_temp }}/{{ site_path }} --username {{ svn_info.user }} --password {{ svn_info.pass }} --force --no-auth-cache --non-interactive --trust-server-cert
+      {% else %}
+         svn up -r {{ revision }} {{ svn_temp }}/{{ site_path }} --username {{ svn_info.user }} --password {{ svn_info.pass }} --force --no-auth-cache --non-interactive --trust-server-cert
+      {% endif %} 
+    > {{ rsync.log_path }}
   run_once: true

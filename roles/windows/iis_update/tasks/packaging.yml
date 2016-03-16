@@ -1,26 +1,13 @@
 ---
 - block:
-#  - local_action: |
-#     shell \
-#      echo -n `/bin/date +%Y%m%d`
-#    register: dtime
-#
-#  - local_action: |
-#     shell \
-#      echo -n `/bin/date +%Y%m%d%k%M`
-#    register: ftime
   - local_action: setup
-
-  - debug: msg={{ ansible_date_time.date }}
 
   - set_fact:
      dtime: "{{ ansible_date_time.date }}"
      ftime: "{{ ansible_date_time.iso8601_basic_short }}"
-  
-  - debug: msg="dtime is {{ dtime }}, ftime if {{ ftime }}"
 
   - set_fact:
-     package_name: "{{ site_path | replace('/','.') }}_r{{ revision }}_t{{ ftime }}.zip"
+     package_name: "{{ site_path | replace('/','.') }}_r{{ revision }}_{{ ftime }}.zip"
 
   - name: Local | "{{ site_path }}" 代码打包
     local_action: |
