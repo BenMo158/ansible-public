@@ -1,0 +1,56 @@
+---
+- block:
+   - name: Windows | Get {{ site }} infomation
+     win_iis_website: name={{ site }}
+     register: site_info
+
+
+   - set_fact:
+      physicalpath: "{{ site_info.site.PhysicalPath }}"
+      pool: "{{ site_info.site.ApplicationPool }}"
+      site_path: "{{ site }}"
+
+  when: app is undefined
+
+- block:
+   - name: Windows | Get {{ site }}/{{ app }} infomation
+     win_iis_webapplication: name={{ app }} site={{ site }}
+     register: site_info
+  
+   - set_fact:
+      physicalpath: "{{ site_info.application.PhysicalPath }}"
+      pool: "{{ site_info.application.ApplicationPool }}"
+      site_path: "{{ site }}/{{ app }}"
+
+  when: app is defined
+
+- block:
+  - name: SVN | Get {{ site_path }} SVN version
+    local_action: |
+      shell svn info {{ svn_info.url }}/{{ site_path }} --username {{ svn_info.user }} --password {{ svn_info.pass }} --no-auth-cache --non-interactive --trust-server-cert | grep -Po "(?<=Revision:\s)\d+"
+    register: revision_latest
+  
+  - name: Local | Get svn infomation
+    local_action: |
+      shell if [ ! -d {{ svn_temp }} ]
+            then
+              mkdir -p {{ svn_temp }}
+            fi
+            svn info {{ svn_temp }}/{{ site_path }} --username {{ svn_info.user }} --password {{ svn_info.pass }} --no-auth-cache --non-interactive --trust-server-cert | awk '/Revision/{print $2}'
+    register: revision_old
+    changed_when: true
+
+  - set_fact:
+     revision: "{{ revision_latest.stdout | int }}"
+    when: (revision is undefined)
+
+  - debug: 
+     msg: |
+       "{{ site_path }}" update to r{{ revision }}
+  
+  - debug:
+     msg: |
+      "{{ site_path }}"  old version is {{ revision_old.stdout | int }}
+    when: (revision_old.stderr == "") and (revision|int != revision_old.stdout|int)
+  
+  run_once: true

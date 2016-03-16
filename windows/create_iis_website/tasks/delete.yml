@@ -1,0 +1,25 @@
+---
+- name: Windows | 检查 "{{ site }}" 信息
+  win_iis_website: name={{ site }}
+  register: check_site
+  ignore_errors: true
+
+- block:
+  - name: Windows | 移除 "{{ site }}" 站点
+    win_iis_website: name={{ site }} state=absent
+
+  - name: Windows | 移除 "{{ site }}" 应用池
+    win_iis_webapppool: name={{ site }} state=absent
+
+  when: (check_site) and (app is undefined)
+  ignore_errors: true
+
+- block:
+  - name: Windows | 移除 "{{ app }}" 应用
+    win_iis_webapplication: name={{ app }} site={{ site }} physical_path={{ site_path }} state=absent
+
+  - name: Windoes | 移除 "{{ app }}" 应用池
+    win_iis_webapppool: name={{ Pool }} state=absent
+
+  when: (check_site) and (app is defined)
+  ignore_errors: true

@@ -1,0 +1,22 @@
+---
+- name: Create {{ site }} directory
+  file: dest={{ CATALINA_BASE }}/{{ item }} state=directory owner={{ TOMCAT_USER }}
+  with_items: ['conf','work','webapps','bin','temp','logs','lib']
+
+- name: Create project directory
+  file: dest={{ PROJECT_BASE }} state=directory owner={{ TOMCAT_USER }}
+
+- name: Copy {{ site }} script
+  template: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }} owner={{ TOMCAT_USER }}
+  with_items:
+  - { src: server.xml, dest: "{{ CATALINA_BASE }}/conf/", mode: 644 }
+  - { src: init.j2, dest: "/etc/init.d/{{ site }}", mode: 755 }
+  - { src: init.j2, dest: "{{ CATALINA_BASE }}/bin/server.sh", mode: 755 }
+
+- name: Copy {{ site }} conf file
+  copy: src={{ item }} dest={{ CATALINA_BASE }}/conf/ mode=0644 owner={{ TOMCAT_USER }}
+  with_fileglob:
+   - '*'
+
+- name: Add {{ site }} to init
+  service: name={{ site }} enabled=yes

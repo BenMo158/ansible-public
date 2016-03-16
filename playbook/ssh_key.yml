@@ -1,0 +1,13 @@
+---
+ - hosts: local
+   
+   tasks:
+
+   - name: Create user ssh key
+     local_action: user: name=p_junkai generate_ssh_key=yes ssh_key_bits=2048
+
+   - name: create authorized_keys
+     authorized_key: user=p_junkai
+                     key="{{ lookup('file', '/home/p_junkai/.ssh/id_rsa.pub') }}"
+                     path='/home/p_junkai/.ssh/authorized_keys'
+                     manage_dir=no

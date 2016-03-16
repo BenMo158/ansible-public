@@ -1,0 +1,25 @@
+---
+# svn infomation
+svn_info:
+ url: https://svn.abc.com/svn
+ user: dxname
+ pass: "ySE1betQK5"
+
+# local
+local_temp: /data/app_temp
+svn_temp: /data/svn_temp
+rsync_temp: /data/rsync_temp
+package_path: /data/package
+
+# rsync infomation
+rsync:
+ module: update_temp
+ ip: 192.168.11.60
+ user: awx
+ pass: JNDhdMo9AlFcnjPb11tu
+ log_path: /data/logs/rsync/rsync_server.log
+
+# security_users
+security_users:
+ - IIS_IUSRS
+ - Administrator

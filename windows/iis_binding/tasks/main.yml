@@ -1,0 +1,8 @@
+---
+- include: facts.yml
+
+- include: binding.yml
+  when: (action == "add")
+
+- include: delete.yml
+  when: (action == "remove") or (action == "del") or (action == "delete")

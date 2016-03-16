@@ -1,0 +1,15 @@
+---
+- name: Windows | Create script temp
+  win_file: path='d:/script_temp' state=directory
+
+- name: Windows | Push rsync script
+  win_template: src={{ item }} dest=d:/script_temp/
+  with_items:
+   - rsync.bat
+   - password.txt
+
+- name: Windows | Run rsync script
+  raw: d:/script_temp/rsync.bat
+
+#- name: Windows | Remove script temp
+#  win_file: path='d:/script_temp' state=absent

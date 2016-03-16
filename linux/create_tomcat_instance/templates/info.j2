@@ -1,0 +1,5 @@
+http_port: {{ port }}
+control_port: {{ port|int + 1000 }}
+name: {{ site }}
+doc_base: {{ PROJECT_BASE }}
+log_base: {{ CATALINA_LOGBASE }}

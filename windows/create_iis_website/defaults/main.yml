@@ -1,0 +1,4 @@
+---
+# physical path
+physical_path: 'd:\iisroot'
+logs_path: 'd:\logs'

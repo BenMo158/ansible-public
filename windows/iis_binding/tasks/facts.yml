@@ -1,0 +1,7 @@
+- set_fact:
+   ip_listen: ''
+  when: (ip is defined)
+
+- set_fact:
+   ip_listen: "{{ ansible_ip_addresses[0] }}"
+  when: (ip is undefined)

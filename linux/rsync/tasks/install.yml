@@ -1,0 +1,30 @@
+- name: ubuntu | Install Rsync and inotify-tools
+  apt: name={{ item }} state=latest
+  with_items:
+   - rsync
+   - inotify-tools
+  when: ansible_os_family == "Debian" 
+
+- name: Upload default file
+  template: src=default_rsync dest=/etc/default/rsync mode=0644
+  when: ansible_os_family == "Debian"
+
+- name: RHEL | Install Rsync and inotify-tools
+  yum: name={{ item }} state=latest
+  with_items:
+   - rsync
+   - inotify-tools
+  when: ansible_os_family == "RedHat"
+
+- name: Create logs rsync directory
+  file: dest=/data/logs/rsync state=directory owner={{ auth_users }} group={{ auth_users }} mode=0755
+
+- name: Upload rsync config file
+  template: src=rsyncd.conf dest=/etc/rsyncd.conf mode=0644
+
+- name: Create Rsync server secrets file
+  lineinfile: dest={{ server_secrets_file }} line='{{ auth_users }}:{{ secrets_pass }}' owner=root group=root mode=0600 create=yes
+
+- name: Add server to rc.local
+  lineinfile: dest=/etc/rc.local line='/usr/bin/rsync --daemon --config=/etc/rsyncd.conf --address={{ ansible_default_ipv4.address }}'
+  when: ansible_os_family == "RedHat"

@@ -1,0 +1,10 @@
+---
+- name: Windows | Remove {{ site }} Binding
+  win_iis_webbinding: 
+   name={{ site }}
+   port={{ port | default(80) }}
+   ip={{ ip_listen }}
+   protocol={{ protocol | default(http) }}
+   host_header={{ host_header | default(omit) }}
+   certificate_hash="{{ cert_hash | default(omit) }}"
+   state=absent

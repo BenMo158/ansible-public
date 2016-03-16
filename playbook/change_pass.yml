@@ -1,0 +1,7 @@
+---
+ - hosts: "{{hosts}}"
+   sudo: yes
+
+   tasks: 
+    - user: name={{ item }} password={{ password | password_hash('sha512') }}
+      with_items: users

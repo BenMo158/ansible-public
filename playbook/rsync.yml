@@ -1,0 +1,21 @@
+---
+ - hosts: localhost
+   sudo: yes
+   gather_facts: yes
+   vars:
+    create_server: yes
+    module_name: update_temp
+    module_path: /data/svn_temp
+    auth_users: dxansible
+    server_secrets_file: /etc/rsyncd_server.secrets
+    server_log: /data/logs/rsync/rsync_server.log
+    secrets_pass: "JNDhdMo9AlFcnjPb11tu"
+    create_client: no
+    peer_ip: "192.168.0.0/16"
+    client_log: /data/logs/rsync/rsync_client.log
+    client_secrets_file: /data/projects/rsync/rsync_client.secrets
+    dirs_to_rsync: 
+     "/data/projects/domain.example.com"
+   
+   roles: 
+    - { role: rsync }

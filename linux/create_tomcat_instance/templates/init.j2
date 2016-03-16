@@ -1,0 +1,137 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          {{ site }}
+# Required-Start:    $local_fs $remote_fs $network
+# Required-Stop:     $local_fs $remote_fs $network
+# Should-Start:      $named
+# Should-Stop:       $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start Tomcat.
+# Description:       Start the Tomcat servlet engine.
+### END INIT INFO
+# Source function library.
+{% if ansible_os_family == "RedHat" %}
+. /etc/rc.d/init.d/functions
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+{% else %}
+. /lib/lsb/init-functions
+{% endif %}
+
+# Make sure tomcat is started with system locale
+if [ -r /etc/default/locale ]; then
+        . /etc/default/locale
+        export LANG
+fi
+
+{% if  JAVA_HOME is undefined %}
+find_openjdks()
+{
+        for jvmdir in /usr/lib/jvm/java-7-openjdk-*
+        do
+                if [ -d "${jvmdir}" -a "${jvmdir}" != "/usr/lib/jvm/java-7-openjdk-common" ]
+                then
+                        OPENJDKS=$jvmdir
+                fi
+        done
+        for jvmdir in /usr/lib/jvm/java-6-openjdk-*
+        do
+                if [ -d "${jvmdir}" -a "${jvmdir}" != "/usr/lib/jvm/java-6-openjdk-common" ]
+                then
+                        OPENJDKS="${OPENJDKS} ${jvmdir}"
+                fi
+        done
+}
+
+OPENJDKS=""
+find_openjdks
+JDK_DIRS="/usr/lib/jvm/default-java ${OPENJDKS} /usr/lib/jvm/java-6-openjdk /usr/lib/jvm/java-6-sun /usr/lib/jvm/java-7-oracle"
+
+# Look for the right JVM to use
+for jdir in $JDK_DIRS; do
+    if [ -r "$jdir/bin/java" -a -z "${JAVA_HOME}" ]; then
+        JAVA_HOME="$jdir"
+    fi
+done
+
+{% else %}
+JAVA_HOME={{ JAVA_HOME }}
+{% endif %}
+
+# Set Tomcat environment.
+export JAVA_HOME
+export CATALINA_HOME={{ CATALINA_HOME }}
+export TOMCAT_HOME=$CATALINA_HOME
+export CATALINA_BASE={{ CATALINA_BASE }}
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$CATALINA_HOME
+export CATALINA_LOGBASE={{ CATALINA_LOGBASE }}
+export CATALINA_OUT=$CATALINA_LOGBASE/catalina.out
+export PATH=$PATH:$JAVA_HOME/bin:/usr/bin:/usr/lib/bin
+
+{% if jvm is undefined %}
+{% set jvm = 128 %}
+{% endif %}
+
+if [ -z "$JAVA_OPTS" ]; then
+        JAVA_OPTS="-Djava.awt.headless=true -Xmx{{ jvm }}M"
+fi
+
+# Set the JSP compiler if set in the tomcat7.default file
+if [ -n "$JSP_COMPILER" ]; then
+        JAVA_OPTS="$JAVA_OPTS -Dbuild.compiler=\"$JSP_COMPILER\""
+fi
+
+[ -f $TOMCAT_HOME/bin/startup.sh ] || exit 0 [ -f $TOMCAT_HOME/bin/shutdown.sh ] || exit 0
+
+lockpath=$CATALINA_BASE/var/lock/subsys
+lockfile=$lockpath/{{ site }}
+_touchlock()
+{
+	if [ ! -d $lockpath ];then
+		mkdir -p $lockpath
+	fi
+}
+_touchlock
+
+# See how we were called.
+case "$1" in
+        start)
+                # Start daemon.
+                echo -n "Starting Tomcat: "
+                $TOMCAT_HOME/bin/startup.sh
+                RETVAL=$?
+                echo
+                        [ $RETVAL = 0 ] && touch $lockfile
+	;;
+        stop)
+                # Stop daemons.
+                echo -n "Shutting down Tomcat: "
+                $TOMCAT_HOME/bin/shutdown.sh
+                RETVAL=$?
+                echo
+                        [ $RETVAL = 0 ] && rm -f $lockfile
+	;;
+        restart)
+                $0 stop
+                $0 start
+        ;;
+        condrestart)
+                [ -e $lockfile ] && $0 restart ;;
+        status)
+		PID=$(ps -ef | grep -v 'grep' | grep "${CATALINA_BASE}/conf/logging.properties" | awk '{print $2}')
+        	if [[ "${PID}X" == "X" ]]; then
+            		echo "tomcat is not running!"
+        	else
+            		echo "tomcat is running!"
+        	fi
+	;;
+        *)
+                echo "Usage: $0 {start|stop|restart|status}"
+        exit 1
+esac
+        exit 0

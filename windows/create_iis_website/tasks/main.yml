@@ -1,0 +1,10 @@
+---
+- include: facts.yml
+
+- include: debug.yml
+
+- include: create.yml
+  when: (action == "add") or (action == "create")
+
+- include: delete.yml
+  when: (action == "delete") or (action == "del") or (action == "remove")

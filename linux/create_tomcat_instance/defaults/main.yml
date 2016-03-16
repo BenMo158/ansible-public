@@ -1,0 +1,7 @@
+TOMCAT_HOME: /usr/local/tomcat
+CATALINA_HOME: /usr/local/tomcat
+CATALINA_BASE: /data/tomcats/{{ site }}
+CATALINA_LOGBASE: /data/tomcats/{{ site }}/logs
+PROJECT_BASE: /data/projects/{{ site }}
+JAVA_HOME: /usr/lib/jvm/java-7-openjdk-amd64
+TOMCAT_USER: p_junkai

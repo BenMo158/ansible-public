@@ -1,0 +1,6 @@
+---
+- hosts: "{{hosts}}"
+  sudo: yes   
+  
+  roles:
+   - { role: create_tomcat_instance, tags: tomcat }

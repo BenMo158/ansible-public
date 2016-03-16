@@ -1,0 +1,8 @@
+---
+- debug:
+   msg: "{{ item }}"
+  with_items:
+   - "{{ site }} physical path {{ site_path }}"
+   - "{{ site }} application pool {{ Pool }}"
+   - "{{ site }} donet version {{ donet | default('v4.0') }}"
+  run_once: true

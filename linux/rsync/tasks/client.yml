@@ -1,0 +1,28 @@
+- name: Check auth user
+  shell: 'id {{ auth_users }}'
+  register: user
+  ignore_errors: yes
+
+- name: Create {{ auth_users }} user
+  user: name={{ auth_users }} home=/home/{{ auth_users }} shell=/bin/bash
+  when: user.rc == 1
+
+- name: Create rsync client directory
+  file: dest=/data/{{ item }}/rsync state=directory owner={{ auth_users }} group={{ auth_users }} mode=0755
+  with_items:
+   - projects
+   - logs
+
+- name: Upload rsync scripts file
+  template: src=rsync.sh dest=/data/projects/rsync/rsync.sh owner={{ auth_users }} group={{ auth_users }} mode=0755
+
+- name: Create rsyncd client secrets file
+  lineinfile: dest={{ client_secrets_file }} line='{{ secrets_pass }}' owner={{ auth_users }} group={{ auth_users }} mode=0600 create=yes
+
+- name: Add rsync dirs path
+  lineinfile: dest=/data/projects/rsync/dirs_to_rsync line='{{ dirs_to_rsync }}' mode=0644 owner={{ auth_users }} group={{ auth_users }} create=yes
+  when: create_client == "yes" and dirs_to_rsync is defined
+
+- name: Copy client stop scripts
+  copy: src=stop.sh dest=/data/projects/rsync/stop_client.sh mode=0755 owner={{ auth_users }} group={{ auth_users }}
+  when: create_client == "yes"

@@ -1,0 +1,40 @@
+---
+- name: Windows | 创建站点目录
+  win_file: path={{ item }} state=directory
+  with_items:
+   - "{{ site_path }}"
+   - "{{ log_path }}"
+
+- name: Windows | 检查 "{{ site }}" 信息
+  win_iis_website: name={{ site }}
+  register: check_site
+  ignore_errors: true
+
+#- debug: msg={{ check_site }}
+   
+- block:
+  - name: Windows | 创建 "{{ site }}" 应用池
+    win_iis_webapppool: name={{ site }} 
+                        state=started
+                        attributes=managedRuntimeVersion:{{ donet | default('v4.0') }}
+  
+  - name: Windows | 创建 "{{ site }}" 站点
+    win_iis_website: name={{ site }}
+                     port={{ port | default(omit) }}
+                     ip={{ ip_listen }}
+                     application_pool={{ site }}
+                     physical_path={{ physical_path }}\\{{ site }}
+                     hostname={{ host_header | default(omit) }}
+                     state=started
+
+  when: (check_site|failed)
+  ignore_errors: true
+
+- block:
+  - name: Windows | 创建 "{{ app }}" 应用池
+    win_iis_webapppool: name={{ Pool }} state=started attributes=managedRuntimeVersion:{{ donet | default('v4.0') }}
+
+  - name: Windows | 创建 "{{ app }}" 应用
+    win_iis_webapplication: name={{ app }} site={{ site }} physical_path={{ site_path }} application_pool={{ Pool }}
+
+  when: (app is defined)

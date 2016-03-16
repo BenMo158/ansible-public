@@ -1,0 +1,14 @@
+---
+- include: facts.yml
+
+- include: local_update.yml
+
+- name: Windows | 停止 "{{ site_path }}" 应用池
+  win_iis_webapppool: name={{ pool }} state=stopped
+
+- include: rsync.yml
+
+- name: Windows | 启动 "{{ site_path }}" 应用池
+  win_iis_webapppool: name={{ pool }} state=started
+
+- include: packaging.yml
