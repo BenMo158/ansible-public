@@ -1,0 +1,17 @@
+- name: Ubuntu | Install memcached
+  apt: name=memcached state=present
+  when: ansible_os_family == "Debian"
+
+- name: Upload memcached rpm
+  copy: src=memcached-1.4.21.rpm dest=/tmp/
+  when: ansible_os_family == "RedHat"
+
+- name: RHEL | Install libevent-devel
+  yum: name=libevent-devel state=present
+  when: ansible_os_family == "RedHat"
+
+- name: RHEL | Install memcached
+  yum: name=/tmp/memcached-1.4.21.rpm state=present
+  when: ansible_os_family == "RedHat"
+
+

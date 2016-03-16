@@ -1,0 +1,31 @@
+---
+- fail: msg="action is not defined!"
+  when: (action is undefined)
+  
+- block:
+  - name: Check memcahed
+    shell: |
+	 {% if ansible_os_family == "RedHat"%}
+	  rpm -qa memcached >/dev/null 2>&1;echo $?
+	 {% endif %}
+	 {% if ansible_os_family == "Debian"%}
+	  dpkg -l memcached >/dev/null 2>&1;echo $?
+	 {% endif %}
+    register: insatll_state
+
+  - include: install.yml
+    when: (install_state.stdout == "1")
+
+  - name: Del default config file
+    file: path=/etc/memcached.conf state=absent
+    when: (install_state.stdout == "1")
+
+  - name: Change config file
+    template: src=memcached.conf dest=/etc/memcached_{{ port | default('11211')}}.conf
+	when: (install_state.stdout == "1")
+	
+  when: (action == "install")
+  
+- name: Add instance
+  template: src=memcached.conf dest=/etc/memcached_{{ port }}.conf
+  when: (action == "add")

@@ -1,0 +1,6 @@
+---
+ - hosts: "{{hosts}}"
+   sudo: yes
+
+   roles:
+    - { role: install_memcached, tags: install_memcached }

@@ -1,0 +1,5 @@
+---
+# default
+memory: 512
+user: memcache
+max_con: 2048
