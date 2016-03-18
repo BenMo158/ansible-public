@@ -22,7 +22,7 @@
 
   - name: Change config file
     template: src=memcached.conf dest=/etc/memcached_{{ port | default('11211')}}.conf
-	when: (install_result.stdout == "1")
+    when: (install_result.stdout == "1")
 	
   when: (action == "install")
   
