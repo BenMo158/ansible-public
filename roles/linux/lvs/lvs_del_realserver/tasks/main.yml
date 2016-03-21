@@ -1,0 +1,9 @@
+- name: Create realserver backup directory
+  file: path=/etc/keepalived/backup/realserver/{{ vrrp_instance_name }} state=directory
+
+- name: Remove realserver node
+  shell: mv /etc/keepalived/realserver/{{ vrrp_instance_name }}/{{ item }}.conf /etc/keepalived/backup/realserver/{{ vrrp_instance_name }}/{{ item }}.conf
+  with_items: realserver_list
+
+- name: Restart keepalived
+  shell: /etc/init.d/keepalived restart

@@ -1,0 +1,30 @@
+---
+ - hosts: "{{hosts}}"
+   sudo: yes
+   vars:
+    # virtual server
+    vrrp_instance_name: ad_http
+    nopreempt: false
+    wan_interface: eth0
+    virtual_router_id: 49
+    vip_address: 172.199.18.100
+    vip_netmask: 24
+    virtual_port: 80
+    lb_algo: rr
+    lb_kind: DR
+    # nat lan gateway
+    lan_interface: eth1
+    lan_gateway: 172.199.19.100
+    # add realserver
+    real_port: 80
+    realserver_list:
+     - 172.199.18.103
+     - 172.199.18.104
+
+   roles:
+    - { role: install_lvs, tags: install }
+    - { role: lvs_virtual_server, tags: add_vip }
+    - { role: lvs_realserver, tags: add_node }
+    - { role: real_config, tags: real_config }
+    - { role: lvs_del_virtual_server, tags: del_vip }
+    - { role: lvs_del_realserver, tags: del_node }

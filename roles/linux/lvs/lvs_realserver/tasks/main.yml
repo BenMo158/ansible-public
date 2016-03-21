@@ -1,0 +1,9 @@
+- name: Create realserver node directory
+  file: path=/etc/keepalived/realserver/{{ vrrp_instance_name }} state=directory
+
+- name: Push realserver config
+  template: src=real.conf dest=/etc/keepalived/realserver/{{ vrrp_instance_name }}/{{ item }}.conf
+  with_items: realserver_list
+
+- name: Restart keepalived
+  shell: /etc/init.d/keepalived restart

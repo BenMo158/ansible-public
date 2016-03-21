@@ -1,0 +1,5 @@
+- name: Copy lvs node scripts
+  template: src=lvs_for_realserver.sh dest=/etc/init.d/lvs-realserver mode=0755
+
+- name: Run node lvs scripts
+  shell: /etc/init.d/lvs-realserver start

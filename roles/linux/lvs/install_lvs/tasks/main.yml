@@ -1,0 +1,26 @@
+#- name: Update Cache
+#  apt: update_cache=yes cache_valid_time=120
+#  when: ansible_os_family == "Debian"
+
+#- name: Install ipvsadm & keepalived
+#  shell: apt-get install {{ item }} -y
+#  with_items:
+#   - keepalived
+#   - ipvsadm
+#  when: ansible_os_family == "Debian"
+
+- name: Install ipvsadm & keepalived
+  yum: name={{ item }} update_cache=yes
+  with_items:
+   - keepalived
+   - ipvsadm
+   
+- name: Copy global config file
+  template: src=global.conf dest=/etc/keepalived/keepalived.conf
+
+- name: Touch intances directory
+  file: path=/etc/keepalived/{{ item }} state=directory
+  with_items:
+   - virtual_server
+   - realserver
+   - backup

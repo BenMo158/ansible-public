@@ -1,0 +1,8 @@
+- name: Create virttual server backup directory
+  file: path=/etc/keepalived/backup/virtual_server state=directory
+
+- name: Remove virtual server
+  shell: mv /etc/keepalived/virtual_server/{{ vrrp_instance_name }}.conf /etc/keepalived/backup/virtual_server/
+
+- name: Restart keepalived
+  shell: /etc/init.d/keepalived restart

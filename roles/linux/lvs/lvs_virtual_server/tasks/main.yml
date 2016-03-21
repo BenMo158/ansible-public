@@ -1,0 +1,9 @@
+- name: Add vip config file to keepalived
+  template: src=vip.conf dest=/etc/keepalived/virtual_server/{{ vrrp_instance_name }}.conf
+
+- name: Set ip_forward
+  sysctl: name=net.ipv4.ip_forward value=1 state=present reload=yes
+  when: lb_kind == "NAT"
+
+- name: Restart keepalived
+  shell: /etc/init.d/keepalived restart
