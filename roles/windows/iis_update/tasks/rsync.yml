@@ -1,5 +1,5 @@
 ---
-- name: Windows | Create script temp
+- name: Windows | Create temp
   win_file: path='d:/script_temp' state=directory
 
 - name: Windows | Push rsync script
@@ -11,5 +11,5 @@
 - name: Windows | Run rsync script
   raw: d:/script_temp/rsync.bat
 
-#- name: Windows | Remove script temp
-#  win_file: path='d:/script_temp' state=absent
+- name: Windows | Remove temp
+  win_file: path='d:/script_temp' state=absent
