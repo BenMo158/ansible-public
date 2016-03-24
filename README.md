@@ -5,6 +5,7 @@
 >* create_tomcat_instance: 配置tomcat多实例
 >* rsync: 配置rsync deamon以及客户端同步脚本
 >* install_memcached: 部署memcached程序，添加多实例操作
+>* lvs: 配置管理keepalived+LVS
 
 ######Windows:
 >* create_iis_website 配置IIS站点
