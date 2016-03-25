@@ -11,4 +11,5 @@
 - name: Windows | 启动 "{{ site_path }}" 应用池
   win_iis_webapppool: name={{ pool }} state=started
 
-- include: packaging.yml
+## 非必要功能 ##
+# - include: packaging.yml
