@@ -86,6 +86,8 @@ if [ -n "$JSP_COMPILER" ]; then
         JAVA_OPTS="$JAVA_OPTS -Dbuild.compiler=\"$JSP_COMPILER\""
 fi
 
+export JAVA_OPTS
+
 [ -f $TOMCAT_HOME/bin/startup.sh ] || exit 0 [ -f $TOMCAT_HOME/bin/shutdown.sh ] || exit 0
 
 lockpath=$CATALINA_BASE/var/lock/subsys
@@ -118,6 +120,7 @@ case "$1" in
 	;;
         restart)
                 $0 stop
+				sleep 2
                 $0 start
         ;;
         condrestart)
