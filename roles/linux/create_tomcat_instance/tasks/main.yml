@@ -10,13 +10,16 @@
   template: src={{ item.src }} dest={{ item.dest }} mode={{ item.mode }} owner={{ TOMCAT_USER }}
   with_items:
   - { src: server.xml, dest: "{{ CATALINA_BASE }}/conf/", mode: 644 }
-  - { src: init.j2, dest: "/etc/init.d/{{ site }}", mode: 755 }
   - { src: init.j2, dest: "{{ CATALINA_BASE }}/bin/server.sh", mode: 755 }
+  - { src: info.j2, dest: "{{ CATALINA_BASE }}/info", mode: 644 }
 
 - name: Copy {{ site }} conf file
   copy: src={{ item }} dest={{ CATALINA_BASE }}/conf/ mode=0644 owner={{ TOMCAT_USER }}
   with_fileglob:
    - '*'
 
-- name: Add {{ site }} to init
-  service: name={{ site }} enabled=yes
+#- name: Link to Sysinit
+#  file: src={{ CATALINA_BASE }}/bin/server.sh dest=/etc/init.d/{{ site }}
+
+#- name: Add {{ site }} to init
+#  service: name={{ site }} enabled=yes

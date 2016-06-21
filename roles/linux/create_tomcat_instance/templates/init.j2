@@ -73,12 +73,8 @@ export CATALINA_LOGBASE={{ CATALINA_LOGBASE }}
 export CATALINA_OUT=$CATALINA_LOGBASE/catalina.out
 export PATH=$PATH:$JAVA_HOME/bin:/usr/bin:/usr/lib/bin
 
-{% if jvm is undefined %}
-{% set jvm = 128 %}
-{% endif %}
-
 if [ -z "$JAVA_OPTS" ]; then
-        JAVA_OPTS="-Djava.awt.headless=true -Xmx{{ jvm }}M"
+        JAVA_OPTS="{{ JAVA_OPTS }}"
 fi
 
 # Set the JSP compiler if set in the tomcat7.default file
